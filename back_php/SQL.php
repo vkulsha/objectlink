@@ -33,7 +33,6 @@ class SQL {
 			$table = ($this->perfixDB).$table;
 			$sth = $this->db->prepare("select $fields from $table where 1=1 $cond $order $limit");  
 			$sth->execute();
-			//$sth = $this->db->query("select ".$fields." from ".$table." where 1=1 ".$cond." ".$order." ".$limit);
 			return $sth->fetchAll();
 			
 		} catch (Exception $e) {
