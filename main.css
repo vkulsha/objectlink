@@ -1,0 +1,90 @@
+html, body {
+	height: 100%;
+	overflow: hidden;
+	width: 100%;
+	margin: 0px;
+	color: #fff;
+	background-color: #000;
+	font-family: Arial;
+	font-size: 12px;
+
+	scrollbar-base-color: rgba(50,50,50,0.3);
+	scrollbar-face-color: rgba(0,0,0,0.3);
+	scrollbar-3dlight-color: rgba(50,50,50,0.3);
+	scrollbar-highlight-color: rgba(50,50,50,0.3);
+	scrollbar-track-color: rgba(0,0,0,0.3);
+	scrollbar-arrow-color: rgba(50,50,50,0.3);
+	scrollbar-dark-shadow-color: rgba(50,50,50,0.3);
+	scrollbar-shadow-color: rgba(50,50,50,0.3);
+	
+}
+
+table.tbobject
+{
+    border: 0px;
+    border-collapse: collapse;
+    border-spacing: 0px;
+	font-family: Arial;
+}
+
+table.tbobject td
+{
+    padding: 0px 0px 0px 10px;
+}
+
+table.tbobjectnotpadding td
+{
+    padding: 0px 0px 0px 0px;
+}
+
+.centered {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+button, select, option {
+	font-family: Arial;
+	background-color: rgba(0,0,0,0.3);
+	border: none;
+	color : #eee;
+}
+
+input.eobject, button.eobject {
+	font-family: Arial;
+	background-color: rgba(0,0,0,0.3);
+	border: 1px solid #555;
+	color : #eee;
+}
+
+button:hover, button:focus{
+	background-color: rgba(255,221,0,0.2);
+	color : #fff;
+	
+}
+
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-button {
+    -webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.3); 
+}
+ 
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.3); 
+}
+ 
+::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.5); 
+}
+
+.checkbox-custom {
+    opacity: 0.1;
+}
+
+.checkbox-custom:checked, .checkbox-custom:hover {
+    opacity: 1;
+}
