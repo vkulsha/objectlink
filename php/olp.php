@@ -19,7 +19,6 @@
 			$p = isset($_POST['p']) ? $_POST['p'] : 0;
 			$u = isset($_POST['u']) ? $_POST['u'] : 0;
 		};
-		$objectlink->u = $u;
 		$func = array($objectlink, $f);
 		$ret = $func(json_decode($p));
 		echo json_encode($ret, JSON_UNESCAPED_UNICODE);
