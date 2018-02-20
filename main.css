@@ -51,6 +51,11 @@ button, select, option {
 	color : #eee;
 }
 
+button {
+	width:100%;
+	text-align: left;
+}
+
 input.eobject, button.eobject {
 	font-family: Arial;
 	background-color: rgba(0,0,0,0.3);

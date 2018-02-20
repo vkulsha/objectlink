@@ -18,9 +18,10 @@ class ObjectLink {
 			if ($sqlLink) $retL = $this->sql->sql([$sqlLink]);
 			$ret = $retO && $retL;
 			if ($ret){
-				return $this->cL((object)Array("o1"=>"root", "o2"=>1, "c"=>1, "u"=>1));
+				$o1 = +$this->cL((object)Array("o1"=>"root", "o2"=>1, "c"=>1, "u"=>1));
+				$o2 = +$this->cL((object)Array("o1"=>"202cb962ac59075b964b07152d234b70", "o2"=>1, "c"=>1, "u"=>1));//password=123
+				return $this->cL((object)Array("o1"=>+$o1, "o2"=>+$o2, "c"=>1, "u"=>1));
 			}
-			
 		} catch (Exception $e) {
 			print($e);
 			return null;
@@ -28,13 +29,13 @@ class ObjectLink {
 	}
 	
 	public function cL($params){
-		$o1 = is_int($params->o1) ? $params->o1 : is_string($params->o1) ? +$this->sql->iT([$this->object, "n", "'$params->o1'"]) : 0;
+		$o1 = is_int($params->o1) ? $params->o1 : (is_string($params->o1) ? +$this->sql->iT([$this->object, "n", "'$params->o1'"]) : 0);
 		$o2 = isset($params->o2) ? $params->o2 : 1;
 		$c = isset($params->c) ? $params->c : 1;
 		$u = isset($params->u) ? $params->u : 0;
 		if (!$o1 || !$o2 || !$u) return;
 		
-		$ret = $this->sql->sT([$this->link, "id", " and o1 = '$o1' and o2 = '$o2' ", "", ""]);
+		$ret = $this->sql->sT([$this->link, "id", " and o1 = $o1 and o2 = $o2 ", "", ""]);
 		$id = count($ret) ? $ret[0][0] : 0;
 		if ($id) {
 			$this->sql->uT([$this->link, "c = $c, d = CURRENT_TIMESTAMP, u = $u", $o2 ? "and o1=$o1 and o2=$o2" : "and id=$o1"]);
@@ -52,11 +53,11 @@ class ObjectLink {
 
 			if ( !is_int($o1) && is_string($o1) ){
 				$id = is_int($o2) ? $o2 : 1;
-				$ret = $this->sql->sT([$this->link, "o1", "and o2=$id and o1 in (select id from $this->object where n = '$o1')", "", "limit 1"]);
+				$ret = $this->sql->sT([$this->link, "o1", "/*and o2=$id*/ and o1 in (select id from $this->object where n = '$o1')", "", "limit 1"]);
 				$o1 = count($ret) ? +$ret[0][0] : 0;
 			}
 			if ( !is_int($o2) && is_string($o2) ){
-				$ret = $this->sql->sT([$this->link, "o1", "and o2=1 and o1 in (select id from $this->object where n = '$o2')", "", "limit 1"]);
+				$ret = $this->sql->sT([$this->link, "o1", "/*and o2=1*/ and o1 in (select id from $this->object where n = '$o2')", "", "limit 1"]);
 				$o2 = count($ret) ? +$ret[0][0] : 0;
 			}
 
@@ -80,10 +81,6 @@ H;
 			print($e);
 			return null;
 		}
-	}
-	
-	public function init(){
-		
 	}
 	
 	

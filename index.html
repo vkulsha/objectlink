@@ -25,7 +25,7 @@
 				<table cellpadding="5" cellspacing="5">
 					<tr><td>Пользователь:</td><td> <input type='text' style='opacity:0.8; border:1px solid #000' id='eUser' autofocus></td></tr>
 					<tr><td>Пароль:</td><td> <input type='password' style='opacity:0.8;  border:1px solid #000' id='ePassword' name='ePassword'></td></tr>
-					<tr><td colspan=2 align='center'><button id='bLogin'>Войти</button></td></tr>
+					<tr><td colspan=2 align='center'><button id='bLogin' style='text-align:center'>Войти</button></td></tr>
 				</table>
 				</form>
 			</div>
@@ -33,10 +33,8 @@
 	
 <script lang="javascript">
 	var currentuser = {id:0};
+	var defaultSelectObjectFunc = root;
 	var frmObject = new Form(false);
-	frmObject.tb = cDom("table","",frmObject.getBody());
-	frmObject.tr = cDom("tr","",frmObject.tb);
-	frmObject.td = cDom("td","",frmObject.tr);
 	
 	function cL(o1,o2,c, callback, params){
 		orma("cL",{"o1":o1,"o2":o2,"c":c ? c : 1,"u":currentuser.id}, callback, params);
@@ -50,12 +48,11 @@
 		var o2 = document.fLogin.eUser.value;
 		gL(o1,o2,function(d,p){
 			if (d && d.length) {
-				new LObject({ id:d[0][0], n:d[0][1], c:d[0][2], d:d[0][3], u:d[0][4], cnt:frmObject.td }).select();
+				currentuser.id = +d[0][0];
+				new LObject({ id:+d[0][0], n:d[0][1], c:+d[0][2], d:d[0][3], u:+d[0][4], pObject:null, cnt:frmObject.getBody(), select:defaultSelectObjectFunc }).select();
 			} else {
 				getXmlHttpReq(function(d,p){
-					var d = JSON.parse(d);
-					if (d) { console.log(p.user); }///???
-
+					if (JSON.parse(d)) { console.log(p.user); }///???
 				}, "php/ldap.php?p1="+p.user+"&p2="+p.password+"&p3=guss.ru", null, true, p);
 			}
 		}, {user:o2, password:document.fLogin.ePassword.value});
@@ -65,11 +62,30 @@
 		gDom("pLoginMain").hidden = true;
 		frmObject.setVisible(true);
 		var cnt = this.cnt;
+		var pObject = this.pObject;
+		if (pObject) {
+			var but = this.but;
+			var tb = pObject.tb;
+			tb.innerHTML = ""
+			cnt = cDom("td","",cDom("tr","",tb));
+			cnt.innerHTML = "";
+			cnt.appendChild(but);
+		}
+		if (this.tb) this.tb.remove();
 		var tb = cDom("table","",cnt);
-		var tr = cDom("tr","",tb);
-		var td = cDom("td","",tr);
-		var but = cDom("button",this.n,td);
+		this.tb = tb;
+		tb.classList.add("tbobject");
 		
+		var o1 = this.id;
+		gL(o1,o1, function(d,p){
+			for (var i=0; i < d.length; i++){
+				var tr = cDom("tr","",p.cnt);
+				var td = cDom("td","",tr);
+				if (p.pObject.id != +d[i][0]) {
+					p.pObject.child.push( new LObject({ id:+d[i][0], n:d[i][1], c:+d[i][2], d:d[i][3], u:+d[i][4], pObject:p.pObject, cnt:td, select:p.pObject.select }) );
+				}
+			}
+		}, {pObject:this, cnt:tb});
 	}
 	
 	function LObject(params){
@@ -81,14 +97,15 @@
 		this.select = typeof(window[this.n]) == "function" ? window[this.n] : params.select;
 
 		this.cnt = params.cnt;
-		this.but = params.but;
+		this.but = cDom("button",this.n,this.cnt);
+		this.but.object = this;
+		this.but.onclick = function(){ this.object.select() };
 		
 		this.pObject = params.pObject;
 		this.cObject = params.cObject;
 		this.child = [];
 	}	
-	LObject.prototype = {
-	}
+	LObject.prototype = {};
 </script>
 	</body>
 </html>
