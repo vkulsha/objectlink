@@ -18,9 +18,18 @@ class ObjectLink {
 			if ($sqlLink) $retL = $this->sql->sql([$sqlLink]);
 			$ret = $retO && $retL;
 			if ($ret){
-				$o1 = +$this->cL((object)Array( "o1"=>"root", "o2"=>1, "c"=>1, "u"=>1 ));
-				$o2 = +$this->cL((object)Array( "o1"=>"202cb962ac59075b964b07152d234b70", "o2"=>1, "c"=>1, "u"=>1 ));//password=123
-				return $this->cL((object)Array( "o1"=>+$o1, "o2"=>+$o2, "c"=>1, "u"=>1 ));
+				$this->sql->iT([$this->object, "id, n", "1, 'root'"]);  
+				$this->sql->iT([$this->object, "id, n", "2, '123'"]);  
+				$this->sql->iT([$this->object, "id, n", "3, 'getLink'"]);  
+				
+				$this->sql->iT([$this->link, "o1, o2, c, d, u", "1, 1, 1, CURRENT_TIMESTAMP, 1"]);  
+				$this->sql->iT([$this->link, "o1, o2, c, d, u", "2, 1, 1, CURRENT_TIMESTAMP, 1"]);  
+				$this->sql->iT([$this->link, "o1, o2, c, d, u", "3, 1, 1, CURRENT_TIMESTAMP, 1"]);  
+				$this->sql->iT([$this->link, "o1, o2, c, d, u", "1, 3, 1, CURRENT_TIMESTAMP, 1"]);  
+				$this->sql->iT([$this->link, "o1, o2, c, d, u", "2, 3, 1, CURRENT_TIMESTAMP, 1"]);  
+				$this->sql->iT([$this->link, "o1, o2, c, d, u", "3, 3, 1, CURRENT_TIMESTAMP, 1"]);  
+				$this->sql->iT([$this->link, "o1, o2, c, d, u", "3, 2, 1, CURRENT_TIMESTAMP, 1"]); 
+				return true;
 			}
 		} catch (Exception $e) {
 			print($e);
@@ -34,8 +43,11 @@ class ObjectLink {
 		$pass = isset($params->pass) ? $params->pass : "";
 		$c = isset($params->c) ? $params->c : 1;
 		
-		$func = "setLink";
-		$policy = $notPolicy || ( $this->getPolicy((object)Array( "id"=>$o2, "func"=>$func, "user"=>$user, "pass"=>$pass )) );
+		$policy = $notPolicy || ( 
+			$this->getPolicy((object)Array( "id"=>$o1, "func"=>"getLink", "user"=>$user, "pass"=>$pass )) &&
+			$this->getPolicy((object)Array( "id"=>$o2, "func"=>"getLink", "user"=>$user, "pass"=>$pass )) &&
+			$this->getPolicy((object)Array( "id"=>$o2, "func"=>"setLink", "user"=>$user, "pass"=>$pass )) 
+		);
 		if (!$policy) return 0;
 		
 		$o1 = is_int($params->o1) ? $params->o1 : ( is_string($params->o1) ? +$this->sql->iT([$this->object, "n", "'$params->o1'"]) : 0 );
@@ -58,10 +70,10 @@ class ObjectLink {
 			//$c = isset($params->c) ? $params->c : 1;
 			$user = isset($params->user) ? $params->user : "";
 			$pass = isset($params->pass) ? $params->pass : "";
-			$func = "getLink";
+
 			$policy = $notPolicy || ( 
-				$this->getPolicy((object)Array( "id"=>$o1, "func"=>$func, "user"=>$user, "pass"=>$pass )) && 
-				$this->getPolicy((object)Array( "id"=>$o2, "func"=>$func, "user"=>$user, "pass"=>$pass )) 
+				$this->getPolicy((object)Array( "id"=>$o1, "func"=>"getLink", "user"=>$user, "pass"=>$pass )) && 
+				$this->getPolicy((object)Array( "id"=>$o2, "func"=>"getLink", "user"=>$user, "pass"=>$pass )) 
 			);
 
 			if ( $o1 && $o2 && ( $notPolicy || $policy ) ) {;

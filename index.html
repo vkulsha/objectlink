@@ -96,7 +96,7 @@
 		this.c = params.c;
 		this.d = params.d;
 		this.u = params.u;
-		this.isClass = this.c > 1;
+		this.isClass = this.c > 1 && params.pObject && params.pObject.id == 1;
 		this.select = typeof(window[this.n]) == "function" ? window[this.n] : params.select;
 
 		this.cnt = params.cnt;
