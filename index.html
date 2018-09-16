@@ -32,70 +32,169 @@
 		</div>
 	
 <script lang="javascript">
-	var currentuser = {user:"",pass:""};
-	var frmObject = new Form(false);
+	let currentuser = {
+	    user: "",
+		pass: "",
+	};
+	const frmObject = new Form(false);
 	
-	function sL(o1,o2,c, callback, params){
-		orma("setLink",{"o1":o1, "o2":o2, "c":(c ? c : 1), "user":currentuser.user, "pass":currentuser.pass}, callback, params);
+	function sL(object, auth, callback, params) {
+	    const { o1, o2, c } = object;
+	    const { user, pass} = auth;
+		orma(
+		    "setLink",
+			{
+			    o1,
+				o2,
+				"c": (c ? c : 1),
+				user,
+				pass,
+			},
+			callback,
+			params,
+		);
 	}
-	function gL(o1,o2, callback, params){
-		orma("getLink",{"o1":o1, "o2":o2, "user":currentuser.user, "pass":currentuser.pass}, callback, params);
-	}
-	
-	gDom("bLogin").onclick = function(){
-		currentuser.user = document.fLogin.eUser.value;
-		currentuser.pass = /*md5(*/document.fLogin.ePassword.value/*)*/;
 
-		gL(currentuser.user,currentuser.pass, function(d,p){
-			for (var i=0; i <= d.length; i++){
-				if (d[i][1] == "getLink") {
-					new LObject({ 
-						id:+d[i][0], n:d[i][1], c:+d[i][2], d:d[i][3], u:+d[i][4], pObject:null, cnt:frmObject.getBody(), select:getLink 
-					}).select();
-				}
-			}
-		}, { user:currentuser.user, password:document.fLogin.ePassword.value });
+	function gL(object, auth, callback, params) {
+        const { o1, o2, c } = object;
+        const { user, pass} = auth;
+		orma(
+		    "getLink",
+			{
+			    o1,
+				o2,
+				user,
+				pass,
+			},
+			callback,
+			params,
+		);
 	}
+	
+	gDom("bLogin").onclick = () => {
+        const {
+            fLogin: {
+                eUser: {
+                    value: user
+                } = {},
+                ePassword: {
+                    value: pass
+                } = {}
+            } = {}
+        } = document;
+
+        currentuser = { user, /*md5(*/pass/*)*/ };
+
+        const { user: o1, pass: o2 } = currentuser;
+        const object = { o1, o2 };
+        const pObject = null;
+        const cnt = frmObject.getBody();
+        const select = getLink;
+
+        const callback = (data) => {
+            for (let o of data) {
+                const [id, n, c, d, u] = o;
+                if (n == "getLink") {
+                    new LObject({
+                        id,
+                        n,
+                        c,
+                        d,
+                        u,
+                        pObject,
+                        cnt,
+                        select,
+                    }).select();
+                }
+            }
+        }
+
+        gL(
+            object,
+            currentuser,
+            callback,
+        );
+
+    }
 	
 	function getLink(){
 		gDom("pLoginMain").hidden = true;
 		frmObject.setVisible(true);
-		var cnt = this.cnt;
-		var pObject = this.pObject;
+
+		let { cnt, pObject, but } = this;
+
 		if (pObject) {
-			var but = this.but;
-			var tb = pObject.tb;
-			tb.innerHTML = ""
-			cnt = cDom("td","",cDom("tr","",tb));
+            const { tb } = pObject;
+			tb.innerHTML = "";
+			cnt = cDom("td", "", cDom("tr", "", tb));
 			cnt.innerHTML = "";
 			cnt.appendChild(but);
 		}
+
 		if (this.tb) this.tb.remove();
-		var tb = cDom("table","",cnt);
+
+		const tb = cDom("table", "", cnt);
 		this.tb = tb;
 		tb.classList.add("tbobject");
 
-		gL(this.id,this.id, function(d,p){
-			for (var i=0; i < d.length; i++){
-				var tr = cDom("tr","",p.cnt);
-				var td = cDom("td","",tr);
-				if (p.pObject.id != +d[i][0]) {
-					p.pObject.child.push( 
-						new LObject({ 
-							id:+d[i][0], n:d[i][1], c:+d[i][2], d:d[i][3], u:+d[i][4], pObject:p.pObject, cnt:td, select:p.pObject.select 
-						}) 
-					);
-				}
-			}
-		}, { pObject:this, cnt:tb });
+        const callback = (data, params) => {
+            const {
+                cnt: tb,
+                pObject
+            } = params;
+
+            const {
+                id: pid,
+                child,
+                select
+            } = pObject;
+
+            for (let o of data){
+                const [ id, n, c, d, u ] = o;
+                const tr = cDom("tr", "", tb);
+                const cnt = cDom("td", "", tr);
+
+                if (pid != +id) {
+                    child.push(
+                        new LObject({
+                            id,
+                            n,
+                            c,
+                            d,
+                            u,
+                            pObject,
+                            cnt,
+                            select,
+                        })
+                    );
+                }
+            }
+        };
+
+        const object = {
+            o1: this.id,
+            o2: this.id,
+        };
+
+        const params = {
+            pObject: this,
+            cnt: tb,
+        };
+
+        gL(
+		    object,
+            currentuser,
+            callback,
+            params,
+        );
 	}
 	
 	function LObject(params){
-		this.id = params.id;
+		this.id = +params.id;
 		this.n = params.n;
-		this.c = params.c;
+		this.c = +params.c;
 		this.d = params.d;
-		this.u = params.u;
+		this.u = +params.u;
 		this.isClass = this.c > 1 && params.pObject && params.pObject.id == 1;
 		this.select = typeof(window[this.n]) == "function" ? window[this.n] : params.select;
 
