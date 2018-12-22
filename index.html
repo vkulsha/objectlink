@@ -32,45 +32,28 @@
 		</div>
 	
 <script lang="javascript">
-	let currentuser = {
-	    user: "",
-		pass: "",
+	let state = {
+	    currentuser: {
+	        user: "",
+            pass: "",
+        }
 	};
-	const frmObject = new Form(false);
-	
-	function sL(object, auth, callback, params) {
-	    const { o1, o2, c } = object;
-	    const { user, pass} = auth;
-		orma(
-		    "setLink",
-			{
-			    o1,
-				o2,
-				"c": (c ? c : 1),
-				user,
-				pass,
-			},
-			callback,
-			params,
-		);
-	}
 
-	function gL(object, auth, callback, params) {
+	const setState = (newState = {}) => {
+	    state = newState;
+    }
+
+	const frmObject = new Form(false);
+
+    const xL = (fname, object, callback, params) => {
         const { o1, o2, c } = object;
-        const { user, pass} = auth;
-		orma(
-		    "getLink",
-			{
-			    o1,
-				o2,
-				user,
-				pass,
-			},
-			callback,
-			params,
-		);
-	}
-	
+        const { user, pass} = state.currentuser;
+        const data = { o1, o2, c, user, pass };
+        orma(fname, data, callback, params);
+    }
+	const sL = (object, callback, params) => xL("setLink", object, callback, params);
+	const gL = (object, callback, params) => xL("getLink", object, callback, params);
+
 	gDom("bLogin").onclick = () => {
         const {
             fLogin: {
@@ -83,10 +66,14 @@
             } = {}
         } = document;
 
-        currentuser = { user, /*md5(*/pass/*)*/ };
+        setState({
+            currentuser: {
+                user,
+                /*md5(*/pass/*)*/
+            }
+        });
 
-        const { user: o1, pass: o2 } = currentuser;
-        const object = { o1, o2 };
+        const object = { o1: user, o2: pass };
         const pObject = null;
         const cnt = frmObject.getBody();
         const select = getLink;
@@ -95,25 +82,12 @@
             for (let o of data) {
                 const [id, n, c, d, u] = o;
                 if (n == "getLink") {
-                    new LObject({
-                        id,
-                        n,
-                        c,
-                        d,
-                        u,
-                        pObject,
-                        cnt,
-                        select,
-                    }).select();
+                    new LObject({ id, n, c, d, u, pObject, cnt, select }).select();
                 }
             }
-        }
+        };
 
-        gL(
-            object,
-            currentuser,
-            callback,
-        );
+        gL(object, callback);
 
     }
 	
@@ -138,16 +112,8 @@
 		tb.classList.add("tbobject");
 
         const callback = (data, params) => {
-            const {
-                cnt: tb,
-                pObject
-            } = params;
-
-            const {
-                id: pid,
-                child,
-                select
-            } = pObject;
+            const { cnt: tb, pObject } = params;
+            const { id: pid, child, select } = pObject;
 
             for (let o of data){
                 const [ id, n, c, d, u ] = o;
@@ -155,38 +121,14 @@
                 const cnt = cDom("td", "", tr);
 
                 if (pid != +id) {
-                    child.push(
-                        new LObject({
-                            id,
-                            n,
-                            c,
-                            d,
-                            u,
-                            pObject,
-                            cnt,
-                            select,
-                        })
-                    );
+                    child.push( new LObject({ id, n, c, d, u, pObject, cnt, select }) );
                 }
             }
         };
 
-        const object = {
-            o1: this.id,
-            o2: this.id,
-        };
-
-        const params = {
-            pObject: this,
-            cnt: tb,
-        };
-
-        gL(
-		    object,
-            currentuser,
-            callback,
-            params,
-        );
+        const object = { o1: this.id, o2: this.id };
+        const params = { pObject: this, cnt: tb };
+        gL(object, callback, params);
 	}
 	
 	function LObject(params){

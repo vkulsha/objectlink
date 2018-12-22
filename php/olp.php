@@ -13,11 +13,9 @@
 		if (isset($_GET['f'])) {
 			$f = $_GET['f'];
 			$p = isset($_GET['p']) ? $_GET['p'] : 0;
-			$u = isset($_GET['u']) ? $_GET['u'] : 0;
 		} else if (isset($_POST['f'])) {
 			$f = $_POST['f'];
 			$p = isset($_POST['p']) ? $_POST['p'] : 0;
-			$u = isset($_POST['u']) ? $_POST['u'] : 0;
 		};
 		$func = array($objectlink, $f);
 		$ret = $func(json_decode($p));

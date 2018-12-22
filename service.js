@@ -1,7 +1,6 @@
 ﻿"use strict";
-var host = location.host;
-var domain = "http://"+host+"/";
-var currentUser = {uid:0, oid:0, cid:1};
+var domain = location.host;
+var host = "http://"+domain+":8080/";
 
 function getWindowHeight(){
    return window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight||0;
@@ -42,13 +41,17 @@ function cInp(type, innerHTML, parentDom) {
 function orm(fName, fParams, func, funcparams, timeout){
 	var ret = Object.create(null);
 	var _func = func || function(result){ return result.params.data = result.data; };
-	getXmlHttpReq(_func,"php/olp.php",{"f":fName,"p":JSON.stringify(fParams), "u" : currentUser.uid}, !!func, funcparams || ret, timeout || 10000);
+	getXmlHttpReq(_func,"php/olp.php",{"f":fName,"p":JSON.stringify(fParams)}, !!func, funcparams || ret, timeout || 10000);
 	return ret.data;
 }
 
 function orma(fName, fParams, func, funcparams, timeout){
-	//getXmlHttpReq(func,"php/olp.php",{"f":fName,"p":JSON.stringify(fParams), "u" : currentUser.uid}, true, funcparams);
 	orm(fName, fParams, func, funcparams, timeout || 10000);
+	return true;
+}
+
+function rest(uri, callback, callbackparams, body, timeout = 10000) {
+    getXmlHttpReq(callback, host+uri, body, true, callbackparams, timeout);
 	return true;
 }
 
@@ -56,7 +59,7 @@ function getXmlHttpReq(func, uri, postdata, async, funcparams, timeout, isjson, 
 	if (async === undefined) async = true;
 	if (isjson === undefined) isjson = true;
 	timeout = timeout || 30000;
-	var getpost = (uri.indexOf("?")>=0 && !postdata) ? "get" : "post";
+	var getpost = (uri.indexOf("?")>=0 || !postdata) ? "get" : "post";
 	
 	var req = null;
 	if (window.XMLHttpRequest) {
@@ -664,7 +667,7 @@ function url2cp1251(str) {
 		var val = arr[arr.length-1];
 		val = convert_to_cp1251(urlencode(val));
 		arr[arr.length-1] = val;
-		return (host == "kulsha.ru") ? arr.join("/") : str;
+		return arr.join("/");
 	} else {
 		return str;
 	}
